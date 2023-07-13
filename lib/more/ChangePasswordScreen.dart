@@ -6,9 +6,12 @@ import 'dart:convert';
 import 'package:flutter/gestures.dart';
 import 'package:login/HomeScreen.dart';
 import 'package:http/http.dart' as http;
-import 'package:fluttertoast/fluttertoast.dart';
+import 'package:login/common/Global.dart';
+import 'package:login/loginScreen.dart';
 import 'package:login/more/MoreScreen.dart';
 import '../string/string.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
 
 void main() {
   runApp(const MaterialApp(home: ChangePasswordScreen()));
@@ -29,14 +32,10 @@ class _myAppState extends State<ChangePasswordScreen> {
 
   Future<void> changePasswordApi() async {
     try {
-      print("mConfirmApiUrl${mChangePasswordApiUrl + mLanguage}");
-      print("mConfirmApiUrl${mAuthToken}");
-      print("mConfirmApiUrl${mAuthId.toString()}");
-      print("mConfirmApiUrl${mOldPassword.text.toString()}");
-      print("mConfirmApiUrl${mNewPassword.text.toString()}");
+      SharedPreferences sharedPreference = await SharedPreferences.getInstance();
       final response = await http.post(
         Uri.parse(mChangePasswordApiUrl),
-        headers: {'authToken': mAuthToken, 'authId': mAuthId.toString()},
+        headers: {'authToken': sharedPreference.getString('authToken').toString(), 'authId': sharedPreference.getString('authId').toString()},
         body: {
           'new_password': mOldPassword.text.toString(),
           'old_password': mNewPassword.text.toString(),
@@ -46,13 +45,7 @@ class _myAppState extends State<ChangePasswordScreen> {
       if (response.statusCode == 200) {
         mResponse = json.decode(response.body);
         if (mResponse['status'] == true) {
-          Fluttertoast.showToast(
-              msg: mResponse['message'],
-              toastLength: Toast.LENGTH_SHORT,
-              gravity: ToastGravity.BOTTOM,
-              timeInSecForIosWeb: 1,
-              backgroundColor: Colors.grey[600],
-              textColor: Colors.white);
+          Global.showSnackBar(context,mResponse['message']);
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(builder: (context) => const MoreScreen()),
@@ -61,7 +54,12 @@ class _myAppState extends State<ChangePasswordScreen> {
 
         // Success
         print(json.decode(response.body));
-      } else {
+      } else if(response.statusCode==401){
+      sharedPreference.setBool('login',false);
+      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>const LoginScreen()));
+    }
+      else
+       {
         // Error
         print('Error: ${response.statusCode}');
       }
@@ -129,51 +127,20 @@ class _myAppState extends State<ChangePasswordScreen> {
                   if (mOldPassword.text.isEmpty &&
                       mNewPassword.text.isEmpty &&
                       mConfirmPassword.text.isEmpty) {
-                    Fluttertoast.showToast(
-                        msg: 'Enter your old Password',
-                        toastLength: Toast.LENGTH_SHORT,
-                        gravity: ToastGravity.BOTTOM,
-                        timeInSecForIosWeb: 1,
-                        backgroundColor: Colors.grey[600],
-                        textColor: Colors.white);
+                    Global.showSnackBar(context,'Enter your old Password');
                   }else if(mOldPassword.text.isEmpty){
-                    Fluttertoast.showToast(
-                        msg: 'Enter your old Password',
-                        toastLength: Toast.LENGTH_SHORT,
-                        gravity: ToastGravity.BOTTOM,
-                        timeInSecForIosWeb: 1,
-                        backgroundColor: Colors.grey[600],
-                        textColor: Colors.white);
-
+                    Global.showSnackBar(context,'Enter your old Password');
                   }else if(mNewPassword.text.isEmpty){
-                    Fluttertoast.showToast(
-                        msg: 'Enter your new Password',
-                        toastLength: Toast.LENGTH_SHORT,
-                        gravity: ToastGravity.BOTTOM,
-                        timeInSecForIosWeb: 1,
-                        backgroundColor: Colors.grey[600],
-                        textColor: Colors.white);
+                    Global.showSnackBar(context,'Enter your new Password');
                   }else if(mConfirmPassword.text.isEmpty){
-                    Fluttertoast.showToast(
-                        msg:'Enter your confirm Password',
-                        toastLength: Toast.LENGTH_SHORT,
-                        gravity: ToastGravity.BOTTOM,
-                        timeInSecForIosWeb: 1,
-                        backgroundColor: Colors.grey[600],
-                        textColor: Colors.white);
+                    Global.showSnackBar(context,'Enter your confirm Password');
                   }else if(mOldPassword.text.isNotEmpty &&
                       mNewPassword.text.isNotEmpty &&
                       mConfirmPassword.text.isNotEmpty){
                     if(mNewPassword.text==mConfirmPassword.text){
                       changePasswordApi();
                     }else{
-                      Fluttertoast.showToast(
-                          msg:'Confirm Password is not correct',
-                          toastLength: Toast.LENGTH_SHORT,
-                          gravity: ToastGravity.BOTTOM,
-                          timeInSecForIosWeb: 1,
-                          backgroundColor: Colors.grey[600],
-                          textColor: Colors.white);
+                      Global.showSnackBar(context,'Confirm Password is not correct');
                     }
                   }
                 },

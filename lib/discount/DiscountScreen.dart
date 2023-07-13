@@ -3,10 +3,12 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:login/logutuser/logoutUser.dart';
+import 'package:login/shared.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../loginScreen.dart';
 import '../string/string.dart';
+import 'package:login/common/Global.dart';
 
 
 void main() {
@@ -24,22 +26,48 @@ class _myAppState extends State<DiscountScreen> {
   int selectedValue = 1;
   TextEditingController targetAmount = TextEditingController();
   TextEditingController offerAmount = TextEditingController();
-
+  final GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey =
+  GlobalKey<ScaffoldMessengerState>();
+  void getDiscount(context) async {
+    var mResponse;
+    SharedPreferences sharedPreference = await SharedPreferences.getInstance();
+    final response = await http.get(
+      Uri.parse(mLogoutApiUrl),
+      headers: {'authToken': sharedPreference.getString('authToken').toString(), 'authId': sharedPreference.getString('authId').toString()},
+    );
+    if (response.statusCode == 200) {
+      mResponse = json.decode(response.body);
+      if (mResponse['status'] == true) {
+        sharedPreference.setBool('login',false);
+        Global.showSnackBar(context, mResponse['message']);
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => LoginScreen()),
+        );
+      } else {
+        Global.showSnackBar(context, mResponse['message']);
+      }
+    } else {
+      print("error${response.statusCode}");
+    }
+  }
   @override
   void initState() {
-
-
-
     super.initState();
+      getDiscount(context);
     selectedValue = 1; // Set initial selected value
   }
 
   var name;
   Future<void> postData() async {
     try {
+    /*  SharedPreferences sharedPreferences=await SharedPreferences.getInstance();
+      sharedPreference.getAuthId();
+      sharedPreference.getAuthToken();*/
+      SharedPreferences sharedPreference = await SharedPreferences.getInstance();
       final response = await http.post(
         Uri.parse(mDiscountApiUrl),
-        headers: {'authToken': mAuthToken, 'authId': mAuthId.toString()},
+        headers: {'authToken': sharedPreference.getString('authToken').toString(), 'authId': sharedPreference.getString('authId').toString()},
         body: {
             'discount_type': selectedValue.toString(),
             'offer_amount': offerAmount.text,
@@ -54,17 +82,11 @@ class _myAppState extends State<DiscountScreen> {
 
       if (response.statusCode == 200) {
         name = json.decode(response.body);
-        Fluttertoast.showToast(
-            msg: name['message'],
-            toastLength: Toast.LENGTH_SHORT,
-            gravity: ToastGravity.BOTTOM,
-            timeInSecForIosWeb: 1,
-            backgroundColor: Colors.grey[600],
-            textColor: Colors.white
-        );
+        Global.showSnackBar(context,name['message']);
         // Success
         print(json.decode(response.body));
       } else if(response.statusCode == 401) {
+        sharedPreference.setBool('login',false);
         Navigator.pushReplacement(
             context,
             MaterialPageRoute(builder: (context) => const LoginScreen()));
@@ -287,7 +309,14 @@ class _myAppState extends State<DiscountScreen> {
     targetAmount.dispose();
   }
 
-  void getDiscount() {
+  void showSnackBars() {
+    final snackBar = const SnackBar(
+      content: Text('This is a SnackBar'),
+      duration: Duration(seconds: 2),
+    );
 
+    // Show the SnackBar using the ScaffoldMessenger
+    final scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
+    scaffoldMessengerKey.currentState?.showSnackBar(snackBar);
   }
 }

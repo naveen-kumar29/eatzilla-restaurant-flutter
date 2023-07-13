@@ -1,13 +1,16 @@
 
 import 'package:flutter/material.dart';
+import 'package:login/HomeScreen.dart';
 import 'loginScreen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
 
 void main() {
   runApp(  const MaterialApp(debugShowCheckedModeBanner: false, home: MyApp()));
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  const MyApp( {super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -27,24 +30,29 @@ class SplashScreen extends StatefulWidget {
 
 class _SplashScreenState extends State<SplashScreen> {
   @override
-  void initState() {
+  void initState() /*async*/ {
     super.initState();
-    bool authProvider =true;
-
+    // var mIsLoginCheck;
+/*
+    SharedPreferences sharedPreference = await SharedPreferences.getInstance();
+*/
+  // mIsLoginCheck= sharedPreference.getBool('login');
     // Add any initialization code or delay here if needed
 
     // Example: navigate to another screen after 2 seconds
     Future.delayed(const Duration(seconds: 5), () {
-      if(authProvider) {
-        print("success");
+      // if(mIsLoginCheck==false) {
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => const LoginScreen()),
         );
-      }else{
-        print(" noooo success");
-
-      }
+      // }else{
+      //   Navigator.pushReplacement(
+      //     context,
+      //     MaterialPageRoute(builder: (context) => const HomeScreen()),
+      //   );
+      //
+      // }
     });
   }
 

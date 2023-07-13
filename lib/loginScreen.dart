@@ -3,7 +3,9 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:login/HomeScreen.dart';
 import 'package:http/http.dart' as http;
-import 'package:fluttertoast/fluttertoast.dart';
+import 'package:login/common/Global.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
 import '../string/string.dart';
 
 // import 'RegisterScreen.dart';
@@ -39,14 +41,12 @@ class _myAppState extends State<LoginScreen> {
 
       if (response.statusCode == 200) {
         mResponse = json.decode(response.body);
-        Fluttertoast.showToast(
-            msg: mResponse['message'],
-            toastLength: Toast.LENGTH_SHORT,
-            gravity: ToastGravity.BOTTOM,
-            timeInSecForIosWeb: 1,
-            backgroundColor: Colors.grey[600],
-            textColor: Colors.white);
+        Global.showSnackBar(context,mResponse['message']);
         if (mResponse['status'] == true) {
+          SharedPreferences sharedPreference = await SharedPreferences.getInstance();
+          sharedPreference.setString('authId', mResponse['authId'].toString());
+          sharedPreference.setString('authToken', mResponse['authToken']);
+          sharedPreference.setBool('login',true);
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(builder: (context) => const HomeScreen()),
@@ -139,29 +139,11 @@ class _myAppState extends State<LoginScreen> {
               child: ElevatedButton(
                   onPressed: () {
                     if (mEmail.text.isEmpty && password.text.isEmpty) {
-                      Fluttertoast.showToast(
-                          msg: 'Enter your email id',
-                          toastLength: Toast.LENGTH_SHORT,
-                          gravity: ToastGravity.BOTTOM,
-                          timeInSecForIosWeb: 1,
-                          backgroundColor: Colors.grey[600],
-                          textColor: Colors.white);
+                      Global.showSnackBar(context,'Enter your email id');
                     } else if (mEmail.text.isEmpty) {
-                      Fluttertoast.showToast(
-                          msg: 'Enter your email id',
-                          toastLength: Toast.LENGTH_SHORT,
-                          gravity: ToastGravity.BOTTOM,
-                          timeInSecForIosWeb: 1,
-                          backgroundColor: Colors.grey[600],
-                          textColor: Colors.white);
+                      Global.showSnackBar(context,'Enter your email id');
                     } else if (password.text.isEmpty) {
-                      Fluttertoast.showToast(
-                          msg: 'Enter your password',
-                          toastLength: Toast.LENGTH_SHORT,
-                          gravity: ToastGravity.BOTTOM,
-                          timeInSecForIosWeb: 1,
-                          backgroundColor: Colors.grey[600],
-                          textColor: Colors.white);
+                      Global.showSnackBar(context,'Enter your password');
                     } else if (mEmail.text.isNotEmpty &&
                         password.text.isNotEmpty) {
                       loginApi();

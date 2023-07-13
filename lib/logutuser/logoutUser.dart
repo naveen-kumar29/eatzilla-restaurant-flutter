@@ -1,43 +1,33 @@
 import 'dart:convert';
 import 'dart:developer';
 import 'package:http/http.dart' as http;
-import 'package:fluttertoast/fluttertoast.dart';
+import 'package:login/common/Global.dart';
 import 'package:login/loginScreen.dart';
 import '../string/string.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
 
 
 void logOutUser(context) async {
   var mResponse;
+  SharedPreferences sharedPreference = await SharedPreferences.getInstance();
   final response = await http.get(
     Uri.parse(mLogoutApiUrl),
-    headers: {'authToken': mAuthToken, 'authId': mAuthId.toString()},
+    headers: {'authToken': sharedPreference.getString('authToken').toString(), 'authId': sharedPreference.getString('authId').toString()},
   );
   if (response.statusCode == 200) {
     mResponse = json.decode(response.body);
     if (mResponse['status'] == true) {
-      Fluttertoast.showToast(
-          msg: mResponse['message'],
-          toastLength: Toast.LENGTH_SHORT,
-          gravity: ToastGravity.BOTTOM,
-          timeInSecForIosWeb: 1,
-          backgroundColor: Colors.grey[600],
-          textColor: Colors.white);
-      mAuthId = mResponse['authId'];
-      mAuthToken = mResponse['authToken'];
+      sharedPreference.setBool('login',false);
+      Global.showSnackBar(context, mResponse['message']);
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => LoginScreen()),
       );
     } else {
-      Fluttertoast.showToast(
-          msg: mResponse['message'],
-          toastLength: Toast.LENGTH_SHORT,
-          gravity: ToastGravity.BOTTOM,
-          timeInSecForIosWeb: 1,
-          backgroundColor: Colors.grey[600],
-          textColor: Colors.white);
+      Global.showSnackBar(context, mResponse['message']);
     }
   } else {
     print("error${response.statusCode}");
