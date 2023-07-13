@@ -27,6 +27,9 @@ class _myAppState extends State<DiscountScreen> {
 
   @override
   void initState() {
+
+
+
     super.initState();
     selectedValue = 1; // Set initial selected value
   }
