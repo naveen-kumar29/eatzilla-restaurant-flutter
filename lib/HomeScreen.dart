@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:login/HomeScreen.dart';
 import 'package:login/loginScreen.dart';
 import 'discount/DiscountScreen.dart';
+import 'foodmanagement/foodmanagement.dart';
 import 'mainScreen/mainScreen.dart';
 import 'more/MoreScreen.dart';
 
@@ -22,16 +23,7 @@ class _myAppState extends State<HomeScreen> {
   int _selectedIndex = 0;
   final List<Widget> _widgetOptions = [
     const mainScreen(),
-    const Column(
-      children: <Widget>[
-        Image(
-          image: AssetImage('assets/images/login_image.png'),
-          fit: BoxFit.fill,
-          height: 200,
-          width: 500,
-        ),
-      ],
-    ),
+    const FoodManagement(),
     const Column(
       children: <Widget>[
         Image(

@@ -91,16 +91,6 @@ class _myAppState extends State<PayoutScreen> {
             );
           },
         )
-
-
-
-
-
-
-      
-
-
-
       /* Column(
           children: <Widget>[
             const Row(

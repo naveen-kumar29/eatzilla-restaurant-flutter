@@ -32,7 +32,7 @@ class _myAppState extends State<DiscountScreen> {
     var mResponse;
     SharedPreferences sharedPreference = await SharedPreferences.getInstance();
     final response = await http.get(
-      Uri.parse(mLogoutApiUrl),
+      Uri.parse(mGetDiscountApiUrl),
       headers: {'authToken': sharedPreference.getString('authToken').toString(), 'authId': sharedPreference.getString('authId').toString()},
     );
     if (response.statusCode == 200) {
@@ -86,7 +86,7 @@ class _myAppState extends State<DiscountScreen> {
         // Success
         print(json.decode(response.body));
       } else if(response.statusCode == 401) {
-        sharedPreference.setBool('login',false);
+        print(response.statusCode);
         Navigator.pushReplacement(
             context,
             MaterialPageRoute(builder: (context) => const LoginScreen()));

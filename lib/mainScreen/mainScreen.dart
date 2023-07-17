@@ -1,13 +1,19 @@
+import 'dart:convert';
 import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:login/string/string.dart';
+import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:table_calendar/table_calendar.dart';
 
+import '../common/Global.dart';
+import '../loginScreen.dart';
 
-
-void main(){
-  runApp(const MaterialApp(home:mainScreen()));
+void main() {
+  runApp(const MaterialApp(home: mainScreen()));
 }
+
 class mainScreen extends StatefulWidget {
   const mainScreen({super.key});
 
@@ -18,30 +24,70 @@ class mainScreen extends StatefulWidget {
 class _myAppState extends State<mainScreen> {
   var fromDate;
   var toDate;
-@override
-  void initState() {
-  var now = DateTime.now();
-  var formatter = DateFormat('yyyy-MM-dd');
-  String formattedDate = formatter.format(now);
-  setState(() {
-    fromDate = formattedDate;
-    toDate = formattedDate;
-  });
-  super.initState();
+  var mTotalOrders;
+  var mTotalEarnings;
+  var mAcceptOrders;
+  var mRejectedOrders;
+
+  void getPayoutDetails(context) async {
+    var mResponse;
+    SharedPreferences sharedPreference = await SharedPreferences.getInstance();
+    final response = await http.post(
+      Uri.parse(mGetPayoutDetailsApiUrl),
+      headers: {
+        'authToken': sharedPreference.getString('authToken').toString(),
+        'authId': sharedPreference.getString('authId').toString()
+      },
+      body: {
+        'end_date': toDate,
+        'start_date': fromDate,
+      },
+    );
+    if (response.statusCode == 200) {
+      mResponse = json.decode(response.body);
+      if (mResponse['status'] == true) {
+        mTotalOrders = mResponse['total_orders'];
+        mTotalEarnings = mResponse['total_earnings'];
+        mAcceptOrders = mResponse['accept_orders'];
+        mRejectedOrders = mResponse['denied_orders'];
+      } else {
+        Global.showSnackBar(context, mResponse['message']);
+      }
+    } else {
+      print("error${response.statusCode}");
+    }
   }
+
+  @override
+  void initState() {
+    var now = DateTime.now();
+    var formatter = DateFormat('yyyy-MM-dd');
+    String formattedDate = formatter.format(now);
+    setState(() {
+      fromDate = formattedDate;
+      toDate = formattedDate;
+      getPayoutDetails(context);
+    });
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Discount'),
+      appBar: AppBar(
+        title: const Text('Home Screen'),
       ),
       // body: TableCalendar(focusedDay: focusedDay, firstDay: firstDay, lastDay: endDay)
       body: Column(
-        children: [
+        children: <Widget>[
+          const SizedBox(height: 20),
           _dateSelectionWidget(),
           const SizedBox(height: 20),
           ElevatedButton(
             onPressed: () {
-
+              setState(() {
+                getPayoutDetails(context);
+              });
             },
             style: ElevatedButton.styleFrom(
               padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 10),
@@ -56,22 +102,20 @@ class _myAppState extends State<mainScreen> {
               children: [
                 Container(
                   height: 100,
-                  width: MediaQuery
-                      .of(context)
-                      .size
-                      .width / 2 - 40,
+                  width: MediaQuery.of(context).size.width / 2 - 40,
                   decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(8),color: Colors.black12),
-                  child: const Padding(
-                    padding: EdgeInsets.fromLTRB(10.0,5.0,0.0,5.0),
+                      borderRadius: BorderRadius.circular(8),
+                      color: Colors.black12),
+                  child:  Padding(
+                    padding: const EdgeInsets.fromLTRB(10.0, 5.0, 0.0, 5.0),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('TotalOrders',
+                        const Text('Total Orders',
                             style: TextStyle(
                                 fontSize: 16, fontWeight: FontWeight.w500)),
-                        Text('',
-                            style: TextStyle(
+                        Text(mTotalOrders,
+                            style: const TextStyle(
                                 fontSize: 18, fontWeight: FontWeight.bold))
                       ],
                     ),
@@ -79,23 +123,20 @@ class _myAppState extends State<mainScreen> {
                 ),
                 Container(
                   height: 100,
-                  width: MediaQuery
-                      .of(context)
-                      .size
-                      .width / 2 - 40,
+                  width: MediaQuery.of(context).size.width / 2 - 40,
                   decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(8),color: Colors.black12),
-                  child: const Padding(
-                    padding: EdgeInsets.fromLTRB(10.0,5.0,0.0,5.0),
+                      borderRadius: BorderRadius.circular(8),
+                      color: Colors.black12),
+                  child:  Padding(
+                    padding: const EdgeInsets.fromLTRB(10.0, 5.0, 0.0, 5.0),
                     child: Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('TotalEarnings',
+                        const Text('Total Earnings',
                             style: TextStyle(
                                 fontSize: 16, fontWeight: FontWeight.w500)),
-                        Text('',
-                            style: TextStyle(
+                        Text(mTotalEarnings,
+                            style: const TextStyle(
                                 fontSize: 18, fontWeight: FontWeight.bold))
                       ],
                     ),
@@ -111,23 +152,20 @@ class _myAppState extends State<mainScreen> {
               children: [
                 Container(
                   height: 100,
-                  width: MediaQuery
-                      .of(context)
-                      .size
-                      .width / 2 - 40,
+                  width: MediaQuery.of(context).size.width / 2 - 40,
                   decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(8),color: Colors.black12),
-                  child: const Padding(
-                    padding: EdgeInsets.fromLTRB(10.0,5.0,0.0,5.0),
+                      borderRadius: BorderRadius.circular(8),
+                      color: Colors.black12),
+                  child:  Padding(
+                    padding: const EdgeInsets.fromLTRB(10.0, 5.0, 0.0, 5.0),
                     child: Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('AcceptedOrders',
+                        const Text('Accepted Orders',
                             style: TextStyle(
                                 fontSize: 16, fontWeight: FontWeight.w500)),
-                        Text('',
-                            style: TextStyle(
+                        Text(mAcceptOrders,
+                            style: const TextStyle(
                                 fontSize: 18, fontWeight: FontWeight.bold))
                       ],
                     ),
@@ -135,20 +173,17 @@ class _myAppState extends State<mainScreen> {
                 ),
                 Container(
                   height: 100,
-                  width: MediaQuery
-                      .of(context)
-                      .size
-                      .width / 2 - 40,
+                  width: MediaQuery.of(context).size.width / 2 - 40,
                   decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(8),color: Colors.black12),
+                      borderRadius: BorderRadius.circular(8),
+                      color: Colors.black12),
                   child: const Padding(
                     padding: EdgeInsets.all(12.0),
                     child: Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'RejectedOrders',
+                          'Rejected Orders',
                           style: TextStyle(
                               fontSize: 16, fontWeight: FontWeight.w500),
                         ),
@@ -179,7 +214,7 @@ class _myAppState extends State<mainScreen> {
             const SizedBox(height: 6),
             InkWell(
               onTap: getFromDate,
-              child:  Row(children: [
+              child: Row(children: [
                 Text(fromDate,
                     style: const TextStyle(
                         fontSize: 18, fontWeight: FontWeight.w500)),
@@ -200,7 +235,7 @@ class _myAppState extends State<mainScreen> {
             const SizedBox(height: 6),
             InkWell(
               onTap: getToDate,
-              child:  Row(children: [
+              child: Row(children: [
                 Text(toDate,
                     style: const TextStyle(
                         fontSize: 18,
@@ -219,7 +254,6 @@ class _myAppState extends State<mainScreen> {
       ],
     );
   }
-
 
   getFromDate() async {
     DateTime? pickedDate = await showDatePicker(
