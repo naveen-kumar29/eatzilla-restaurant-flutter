@@ -1,169 +1,93 @@
-import 'package:custom_tabbar/Foodlist/model/foodlist_model.dart';
-import 'package:custom_tabbar/Orders/order_widgets.dart';
-import 'package:custom_tabbar/Utils/app_loader.dart';
-import 'package:custom_tabbar/Utils/app_strings.dart';
-import 'package:custom_tabbar/Utils/constants.dart';
-import 'package:custom_tabbar/Utils/flutter_toast.dart';
-import 'package:custom_tabbar/Utils/network_service.dart';
-import 'package:custom_tabbar/Utils/url_generator.dart';
-import 'package:custom_tabbar/restaurant_available_widget.dart';
+import 'dart:developer';
 import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
+import 'dart:convert';
+import 'package:flutter/gestures.dart';
+import 'package:login/HomeScreen.dart';
+import 'package:http/http.dart' as http;
+import 'package:login/common/Global.dart';
+import 'package:login/loginScreen.dart';
+import 'package:login/more/MoreScreen.dart';
+import '../string/string.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-import '../Utils/app_colors.dart';
+
+void main() {
+  runApp(const MaterialApp(home: FoodManagement()));
+
+}
 
 class FoodManagement extends StatefulWidget {
   const FoodManagement({super.key});
 
   @override
-  State<FoodManagement> createState() => _ManagementViewState();
+  State<FoodManagement> createState() => _myAppState();
 }
 
-class _ManagementViewState extends State<FoodManagement> {
-  final GlobalKey _keyLoaderDialog = GlobalKey();
+class _myAppState extends State<FoodManagement> {
+  var mResponse;
 
+  Future<void> GetFoodList() async {
+    try {
+      SharedPreferences sharedPreference = await SharedPreferences.getInstance();
+      final response = await http.get(
+        Uri.parse(mGetFoodListApiUrl),
+        headers: {'authToken': sharedPreference.getString('authToken').toString(), 'authId': sharedPreference.getString('authId').toString()},
+      );
+
+      if (response.statusCode == 200) {
+        mResponse = json.decode(response.body);
+        if (mResponse['status'] == true) {
+          print('${json.decode(response.body)}');
+        }
+
+        // Success
+        print(json.decode(response.body));
+      } else if(response.statusCode==401){
+        sharedPreference.setBool('login',false);
+        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>const LoginScreen()));
+      }
+      else
+      {
+        // Error
+        print('Error: ${response.statusCode}');
+      }
+    } catch (e) {
+      // Exception
+      print('Exception: $e');
+    }
+  }
+  List<String> items = [
+    'Item 1',
+    'Item 2',
+    'Item 3',
+    // Add more items as needed
+  ];
   @override
   void initState() {
+    GetFoodList();
     super.initState();
-    _getFoodLsit();
   }
-
-  _getFoodLsit() {
-    _foodDetails = getRestaurantFoodList(Resource(url: Urls.getFoodList));
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: const Text(
-            '',
-            style: TextStyle(color: Colors.black),
-          ),
-          centerTitle: false,
-          elevation: 0,
-          backgroundColor: Colors.white,
+          title: const Text('Payout Details'),
         ),
-        body: FutureBuilder<FoodListResponse>(
-          future: _foodDetails,
-          builder: (context, snapshot) {
-            return _handleOrderResponse(snapshot);
+        body:ListView.builder(
+          itemCount: items.length,
+          itemBuilder: (BuildContext context, int index) {
+            return Padding(
+              padding: const EdgeInsets.all(10.0),
+              child: Card(
+                child: ListTile(
+                  title: Text(items[index]),
+                ),
+              ),
+            );
           },
-        ));
-  }
-
-  _handleOrderResponse(AsyncSnapshot<FoodListResponse> snapshot) {
-    switch (snapshot.connectionState) {
-      case ConnectionState.done:
-        var foodDetails = snapshot.data?.details;
-        return (snapshot.hasData && foodDetails != null)
-            ? _bodyWidget(snapshot.data!.details!)
-            : noDataView(kNoDataFound, textColor: kPrimaryColor);
-      default:
-        return loaderWidget(valueColor: kPrimaryColor);
-    }
-  }
-
-  _bodyWidget(List<FoodCategoryDetails> foodList) {
-    return Column(
-      children: [
-        const Padding(
-          padding: EdgeInsets.fromLTRB(12, 5, 10, 0),
-          child: RestaurantWidget(),
-        ),
-        Expanded(
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Card(
-              child: Container(
-                height: double.infinity,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(6),
-                ),
-                child: ListView.builder(
-                    itemCount: foodList.length,
-                    shrinkWrap: true,
-                    itemBuilder: ((context, index) {
-                      return Padding(
-                        padding: const EdgeInsets.fromLTRB(12, 5, 12, 0),
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                foodList[index].categoryName ?? '',
-                                style: const TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.w700,
-                                ),
-                              ),
-                              const SizedBox(height: 15),
-                              SizedBox(
-                                height:
-                                (foodList[index].items?.length ?? 0) * 70,
-                                child: _foodListWidget(
-                                    foodList[index].items ?? []),
-                              )
-                            ],
-                          ),
-                        ),
-                      );
-                    })),
-              ),
-            ),
-          ),
         )
-      ],
-    );
-  }
-
-  _foodListWidget(List<Items> foodList) {
-    return ListView.builder(
-      shrinkWrap: true,
-      physics: const ScrollPhysics(),
-      itemCount: foodList.length,
-      itemBuilder: ((context, index) {
-        return Padding(
-          padding: const EdgeInsets.all(5.0),
-          child: Row(
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Icon(
-                            Icons.circle_rounded,
-                            color: foodList[index].isVeg == 0
-                                ? Colors.red
-                                : Colors.green,
-                            size: 16,
-                          ),
-                        ),
-                        Expanded(
-                          child: Text(
-                            foodList[index].name ?? '',
-                            style: const TextStyle(
-                                fontWeight: FontWeight.normal, fontSize: 16),
-                          ),
-                        ),
-                      ],
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(35, 0, 8, 8),
-                      child: Text(''),
-                          style: const TextStyle(fontSize: 16)),
-                    )
-                  ],
-                ),
-              ),
-            ],
-          ),
-        );
-      }),
-    );
+      );
   }
 }

@@ -6,6 +6,7 @@ import 'discount/DiscountScreen.dart';
 import 'foodmanagement/foodmanagement.dart';
 import 'mainScreen/mainScreen.dart';
 import 'more/MoreScreen.dart';
+import 'orderscreen/OrderScreen.dart';
 
 void main() {
   runApp(
@@ -24,16 +25,7 @@ class _myAppState extends State<HomeScreen> {
   final List<Widget> _widgetOptions = [
     const mainScreen(),
     const FoodManagement(),
-    const Column(
-      children: <Widget>[
-        Image(
-          image: AssetImage('assets/images/restaurant_splash.jpg'),
-          fit: BoxFit.fill,
-          height: 200,
-          width: 500,
-        ),
-      ],
-    ),
+          OrderScreen(),
     const DiscountScreen(),
     const MoreScreen(),
   ];

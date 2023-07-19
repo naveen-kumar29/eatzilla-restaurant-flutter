@@ -6,7 +6,6 @@ import 'package:login/string/string.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:table_calendar/table_calendar.dart';
-
 import '../common/Global.dart';
 import '../loginScreen.dart';
 
@@ -22,12 +21,12 @@ class mainScreen extends StatefulWidget {
 }
 
 class _myAppState extends State<mainScreen> {
-  var fromDate;
-  var toDate;
-  var mTotalOrders;
-  var mTotalEarnings;
-  var mAcceptOrders;
-  var mRejectedOrders;
+  late String fromDate;
+  late String toDate;
+  int mTotalOrders=0;
+  int mTotalEarnings=0;
+  int mAcceptOrders=0;
+  int mRejectedOrders=0;
 
   void getPayoutDetails(context) async {
     var mResponse;
@@ -77,7 +76,6 @@ class _myAppState extends State<mainScreen> {
       appBar: AppBar(
         title: const Text('Home Screen'),
       ),
-      // body: TableCalendar(focusedDay: focusedDay, firstDay: firstDay, lastDay: endDay)
       body: Column(
         children: <Widget>[
           const SizedBox(height: 20),
@@ -114,7 +112,7 @@ class _myAppState extends State<mainScreen> {
                         const Text('Total Orders',
                             style: TextStyle(
                                 fontSize: 16, fontWeight: FontWeight.w500)),
-                        Text(mTotalOrders,
+                        Text(mTotalOrders.toString(),
                             style: const TextStyle(
                                 fontSize: 18, fontWeight: FontWeight.bold))
                       ],
@@ -135,7 +133,7 @@ class _myAppState extends State<mainScreen> {
                         const Text('Total Earnings',
                             style: TextStyle(
                                 fontSize: 16, fontWeight: FontWeight.w500)),
-                        Text(mTotalEarnings,
+                        Text(mTotalEarnings.toString(),
                             style: const TextStyle(
                                 fontSize: 18, fontWeight: FontWeight.bold))
                       ],
@@ -164,7 +162,7 @@ class _myAppState extends State<mainScreen> {
                         const Text('Accepted Orders',
                             style: TextStyle(
                                 fontSize: 16, fontWeight: FontWeight.w500)),
-                        Text(mAcceptOrders,
+                        Text(mAcceptOrders.toString(),
                             style: const TextStyle(
                                 fontSize: 18, fontWeight: FontWeight.bold))
                       ],
@@ -177,19 +175,19 @@ class _myAppState extends State<mainScreen> {
                   decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(8),
                       color: Colors.black12),
-                  child: const Padding(
-                    padding: EdgeInsets.all(12.0),
+                  child:  Padding(
+                    padding: const EdgeInsets.all(12.0),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
+                        const  Text(
                           'Rejected Orders',
                           style: TextStyle(
                               fontSize: 16, fontWeight: FontWeight.w500),
                         ),
                         Text(
-                          '',
-                          style: TextStyle(
+                          mRejectedOrders.toString(),
+                          style: const TextStyle(
                               fontSize: 18, fontWeight: FontWeight.bold),
                         )
                       ],

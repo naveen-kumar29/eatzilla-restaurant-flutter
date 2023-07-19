@@ -4,7 +4,7 @@ import 'package:login/logutuser/logoutUser.dart';
 
 import 'ChangePasswordScreen.dart';
 import 'EarningsScreen.dart';
-import 'PayoutScreen.dart';
+import 'httpservice/PayoutScreen.dart';
 import 'SupportScreen.dart';
 class MoreScreen extends StatefulWidget {
   const MoreScreen({super.key});
