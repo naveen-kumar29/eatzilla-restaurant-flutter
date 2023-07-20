@@ -17,8 +17,8 @@ class HttpService {
 
 
     if (res.statusCode == 200) {
-      List<dynamic> body = jsonDecode(res.body);
-
+     var mResponse=jsonDecode(res.body);
+      List<dynamic> body = mResponse[PayoutDetails.fromJson(mResponse).details];
       List<PayoutDetails> posts = body
           .map(
             (dynamic item) => PayoutDetails.fromJson(item),

@@ -1,30 +1,11 @@
-import 'dart:developer';
-import 'package:flutter/material.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'dart:convert';
-import 'package:flutter/gestures.dart';
-import 'package:login/HomeScreen.dart';
-import 'package:http/http.dart' as http;
-import 'package:login/common/Global.dart';
-import 'package:login/loginScreen.dart';
-import 'package:login/more/MoreScreen.dart';
-import '../../string/string.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-
 import 'HttpService.dart';
 import 'User.dart';
 
 
 void main() {
   runApp(const MaterialApp(home: PayoutScreen()));
-
-}
-class Post{
-  final int id;
-  final int restaurant_id;
-
-  Post({required this.id, required this.restaurant_id});
 }
 class PayoutScreen extends StatefulWidget {
   const PayoutScreen({super.key});
@@ -34,7 +15,6 @@ class PayoutScreen extends StatefulWidget {
 }
 
 class _myAppState extends State<PayoutScreen> {
-  var mResponse;
 /*  FutureBuilder<List<User>> _buildBody(BuildContext context) {
     final HttpService httpService = HttpService();
     return FutureBuilder<List<User>>(
@@ -103,7 +83,7 @@ class _myAppState extends State<PayoutScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: Text("Flutter - API Implementation"),
+        title: Text("Payout Details"),
       ),
       body: _buildBody(context),
       floatingActionButton: FloatingActionButton.extended(
@@ -123,12 +103,13 @@ class _myAppState extends State<PayoutScreen> {
 
       future: httpService.getPosts(),
       builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.done) {
+        if (snapshot.data!=null&&snapshot.connectionState == ConnectionState.done) {
           final List<PayoutDetails>? posts = snapshot.data;
           return _buildPosts(context, posts!);
         } else {
           return Center(
-            child: CircularProgressIndicator(),
+            // child: CircularProgressIndicator(),
+            child: Text('No Data Found'),
           );
         }
       },
