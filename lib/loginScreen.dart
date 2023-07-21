@@ -29,7 +29,7 @@ class _myAppState extends State<LoginScreen> {
   Future<void> loginApi() async {
     try {
       final response = await http.post(
-        Uri.parse(mLoginApiUrl),
+          Uri.parse(mLoginApiUrl),
         body: {
           'device_token': mDeviceToken,
           'device_type': mDeviceType,

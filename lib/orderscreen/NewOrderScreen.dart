@@ -2,7 +2,6 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter/material.dart';
 
-import 'newOrderModel.dart';
 
 void main(){
   runApp(const MaterialApp(home:NewOrderScreen()));
