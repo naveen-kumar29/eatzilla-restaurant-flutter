@@ -22,13 +22,14 @@ class _myAppState extends State<FoodManagement> {
   var mResponse;
 
   List<dynamic> data = [];
+  List<dynamic> items = [];
+  List<dynamic> name = [];
 
   @override
   void initState() {
-    payOutDetails();
+      payOutDetails();
     super.initState();
   }
-
   Future<void> payOutDetails() async {
     SharedPreferences sharedPreference = await SharedPreferences.getInstance();
     try {
@@ -44,8 +45,14 @@ class _myAppState extends State<FoodManagement> {
           // Convert the JSON response to a List or List<Map> based on your API structure.
           // data = json.decode(response.body);
           mResponse = json.decode(response.body);
-          data = mResponse['details']['items'];
+          data = mResponse['details'];
           print('naveen${data}');
+          for (int i = 0; i < data.length; i++) {
+            setState(() {
+              items=data[i]['items'];
+              print('naveen${items[i]['name']}');
+            });
+          }
         });
       } else {
         print('Failed to fetch data: ${response.statusCode}');
@@ -62,14 +69,14 @@ class _myAppState extends State<FoodManagement> {
           title: const Text('Food Management'),
         ),
         body: ListView.builder(
-          itemCount: data.length,
+          itemCount: items.length,
           itemBuilder: (BuildContext context, int index) {
             return Padding(
               padding:
                   const EdgeInsetsDirectional.fromSTEB(10.0, 5.0, 10.0, 5.0),
               child: SingleChildScrollView(
                 child: Card(
-                  color: Colors.indigo,
+                  color: Colors.white70,
                   child: ListTile(
                     title: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -78,7 +85,7 @@ class _myAppState extends State<FoodManagement> {
                           padding: const EdgeInsetsDirectional.fromSTEB(
                               0.0, 10.0, 0.0, 5.0),
                           child: Text(
-                            data[index]['details'],
+                            items[index]['name'].toString(),
                             style: TextStyle(
                                 fontWeight: FontWeight.bold,
                                 color: Colors.black),
