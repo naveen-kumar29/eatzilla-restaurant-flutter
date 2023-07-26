@@ -57,12 +57,6 @@ class _myAppState extends State<OngoingOrderScreen> {
     payOutDetails();
     super.initState();
   }
-  List<String> items = [
-    'Ongoing Order 1',
-    'Ongoing Order 2',
-    'Ongoing Order 3',
-    // Add more items as needed
-  ];
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -79,20 +73,34 @@ class _myAppState extends State<OngoingOrderScreen> {
                    children: [
                      Padding(
                        padding: const EdgeInsets.fromLTRB(5.0,5.0,5.0,0.0),
-                       child: Text('Order ID : ${data[index]['order_id'].toString()}'),
+                       child: Row(
+                         children: [
+                           const Text('Order ID : ',style: TextStyle(color: Colors.blue)),
+                           Text(data[index]['order_id'].toString()),
+                         ],
+                       ),
                      ),
                      Padding(
                        padding: const EdgeInsets.fromLTRB(5.0,5.0,5.0,0.0),
                        child: Text('Delivery Time : ${data[index]['ordered_on'].toString()}'),
                      ),
+                     const Padding(
+                       padding: EdgeInsets.fromLTRB(5.0,10.0,5.0,0.0),
+                       child: Text('Order type :Door Delivery',style: TextStyle(color: Colors.black)),
+                     ),
                      Padding(
                        padding: const EdgeInsets.fromLTRB(5.0,10.0,5.0,0.0),
                        child: Text('₹ ${data[index]['bill_amount'].toString()}',style: TextStyle(color: Colors.blue)),
                      ),
-                     SizedBox(height: 30,),
-                     Padding(
-                       padding: const EdgeInsets.fromLTRB(5.0,5.0,5.0,0.0),
-                       child: Text('Order Status : ${data[index]['bill_amount'].toString()}',style: TextStyle(color: Colors.blue)),
+                     const SizedBox(height: 30,),
+                     const Padding(
+                       padding: EdgeInsets.fromLTRB(5.0,5.0,5.0,0.0),
+                       child: Row(
+                         children: [
+                           Text('Order Status :  ',style: TextStyle(color: Colors.black)),
+                           Text('ORDER APPROVED',style: TextStyle(color: Colors.blue)),
+                         ],
+                       ),
                      ),
 
                    ],

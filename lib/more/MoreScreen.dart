@@ -3,7 +3,7 @@ import 'package:login/loginScreen.dart';
 import 'package:login/logutuser/logoutUser.dart';
 
 import 'ChangePasswordScreen.dart';
-import 'EarningsScreen.dart';
+import 'earningsscreen/EarningsScreen.dart';
 import 'PayoutScreen.dart';
 import 'SupportScreen.dart';
 class MoreScreen extends StatefulWidget {
@@ -45,7 +45,7 @@ class _MoreScreenState extends State<MoreScreen> {
                 ListTile(
                   onTap: () {
                     Navigator.of(context).push(
-                        MaterialPageRoute(builder: (context) => const EarningsScreen()));
+                        MaterialPageRoute(builder: (context) => EarningsScreen()));
                   },
                   title: const Text(
                     'Earnings',
