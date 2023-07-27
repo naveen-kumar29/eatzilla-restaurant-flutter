@@ -125,7 +125,10 @@ void showAlertDialog(BuildContext context) {
   Widget continueButton = TextButton(
     child: const Text("Logout"),
     onPressed:  () {
+
+      Navigator.of(_dialogKey.currentContext!).pop();
       logOutUser(context);
+
     },
   );
 

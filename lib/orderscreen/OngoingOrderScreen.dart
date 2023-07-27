@@ -6,6 +6,8 @@ import 'package:login/string/string.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 
+import '../loginScreen.dart';
+
 
 void main(){
   runApp(const MaterialApp(home:OngoingOrderScreen()));
@@ -45,7 +47,11 @@ class _myAppState extends State<OngoingOrderScreen> {
             });
 
         });
-      } else {
+      } else if(response.statusCode==401) {
+        Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => const LoginScreen()));
+      }else {
         print('Failed to fetch data: ${response.statusCode}');
       }
     } catch (e) {

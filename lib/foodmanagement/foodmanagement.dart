@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:login/string/string.dart';
+import '../loginScreen.dart';
 import '../string/string.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -54,7 +55,11 @@ class _myAppState extends State<FoodManagement> {
             });
           }
         });
-      } else {
+      } else if(response.statusCode==401) {
+        Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => const LoginScreen()));
+      }else {
         print('Failed to fetch data: ${response.statusCode}');
       }
     } catch (e) {

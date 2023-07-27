@@ -7,6 +7,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'package:login/string/string.dart';
 
+import '../../loginScreen.dart';
+
 void main() {
   runApp(const MaterialApp(home: DailyScreen()));
 }
@@ -21,7 +23,7 @@ class DailyScreen extends StatefulWidget {
 class _myAppState extends State<DailyScreen> {
   var mFilterDate;
   var mResponse;
-  late int mTodayEarnings;
+   int mTodayEarnings=0;
 
   @override
   void initState() {
@@ -88,7 +90,10 @@ class _myAppState extends State<DailyScreen> {
     if (pickedDate != null) {
       String formattedDate = DateFormat('yyyy-MM-dd').format(pickedDate);
       setState(() {
-        mFilterDate = formattedDate;
+        setState(() {
+          mFilterDate = formattedDate;
+          DailyEarningsApi();
+        });
       });
     } else {}
   }
@@ -106,16 +111,16 @@ class _myAppState extends State<DailyScreen> {
       }
       );
       if (response.statusCode == 200) {
-        setState(() {
-          // Convert the JSON response to a List or List<Map> based on your API structure.
-          // data = json.decode(response.body);
           setState(() {
             mResponse = json.decode(response.body);
             mTodayEarnings=mResponse['today_earnings'];
             print('response :${mResponse}');
           });
-        });
-      } else {
+      } else if(response.statusCode==401){
+        Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => const LoginScreen()));
+      }else {
         print('Failed to fetch data: ${response.statusCode}');
       }
     } catch (e) {

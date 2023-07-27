@@ -29,30 +29,12 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
-  @override
-  void initState() /*async*/ {
-    super.initState();
-    // var mIsLoginCheck;
-/*
-    SharedPreferences sharedPreference = await SharedPreferences.getInstance();
-*/
-  // mIsLoginCheck= sharedPreference.getBool('login');
-    // Add any initialization code or delay here if needed
 
-    // Example: navigate to another screen after 2 seconds
-    Future.delayed(const Duration(seconds: 5), () {
-      // if(mIsLoginCheck==false) {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => const LoginScreen()),
-        );
-      // }else{
-      //   Navigator.pushReplacement(
-      //     context,
-      //     MaterialPageRoute(builder: (context) => const HomeScreen()),
-      //   );
-      //
-      // }
+  @override
+  void initState()  {
+    super.initState();
+    setState(() {
+   checkLogin();
     });
   }
 
@@ -81,5 +63,25 @@ class _SplashScreenState extends State<SplashScreen> {
         ),
       ),
     );
+  }
+
+  void checkLogin() async {
+    SharedPreferences sharedPreference = await SharedPreferences.getInstance();
+    if(sharedPreference.getString('authToken')!=null && sharedPreference.getString('authId')!=null){
+      Future.delayed(const Duration(seconds: 5), () {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const HomeScreen()),
+        );
+      });
+    }else{
+      Future.delayed(const Duration(seconds: 5), () {
+        // if(mIsLoginCheck==false) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const LoginScreen()),
+        );
+      });
+    }
   }
 }

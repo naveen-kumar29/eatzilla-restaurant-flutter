@@ -52,7 +52,11 @@ class _myAppState extends State<mainScreen> {
       } else {
         Global.showSnackBar(context, mResponse['message']);
       }
-    } else {
+    } else if(response.statusCode==401){
+      Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const LoginScreen()));
+    }else {
       print("error${response.statusCode}");
     }
   }

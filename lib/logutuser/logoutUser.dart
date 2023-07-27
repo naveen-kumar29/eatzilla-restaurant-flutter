@@ -22,9 +22,12 @@ void logOutUser(context) async {
     if (mResponse['status'] == true) {
       sharedPreference.setBool('login',false);
       Global.showSnackBar(context, mResponse['message']);
+      sharedPreference.clear();
+      print('naveen${sharedPreference.getString('authToken').toString()+sharedPreference.getString('authId').toString()}');
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => LoginScreen()),
+
       );
     } else {
       Global.showSnackBar(context, mResponse['message']);
